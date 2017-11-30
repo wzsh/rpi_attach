@@ -1,6 +1,8 @@
-# Raspberry PI libraries
-## rpitouch.h 
-rpitouch.h is a library for handling touch event of raspberry pi with touchable LCD on Raspbian OS.
+# Raspberry Pi Toolkits by wzs
+This repository collects some useful toolkits of mine when played with raspberry pi. 
+
+## 1. rpitouch.h 
+rpitouch.h is a library for handling touch event of Raspberry Pi mounted with a touchable LCD on Raspbian OS.
 
 ### Usage:
   1. #include "rpitouch.h"
@@ -26,3 +28,5 @@ rpitouch.h is a library for handling touch event of raspberry pi with touchable 
        ```
 ### Notice:
   The libX11.so library is required to add to the link path. The libX11.so is defaultly located at /usr/lib/arm-linux-gnueabihf/
+
+## 2. To be continued
