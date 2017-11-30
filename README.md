@@ -1,17 +1,15 @@
 # Raspberry Pi Toolkits by wzs
-This repository collects some useful toolkits of mine when played with raspberry pi. 
+This repository collects some useful toolkits of mine when played with Raspberry Pi. 
 
 ## 1. rpitouch.h 
 rpitouch.h is a library for handling touch event of Raspberry Pi mounted with a touchable LCD on Raspbian OS.
 
 ### Usage:
   1. #include "rpitouch.h"
-  2. init: 
-    WZS::RPiTouch touch; 
-    
- 		or 
-    
- 		WZS::RPiTouch* ptouch = new WZS::RPiTouch(); // need delete operation 
+  2. init:   
+    WZS::RPiTouch touch;     
+ 		or     
+ 		WZS::RPiTouch* ptouch = new WZS::RPiTouch(); // need delete operation( delete ptouch; ) 
     
   3. update:
   
