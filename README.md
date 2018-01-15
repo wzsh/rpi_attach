@@ -1,5 +1,5 @@
 # My Raspberry Pi Toolkits
-This repository collects some useful toolkits of mine when played with Raspberry Pi. 
+This repository includes some useful toolkits of Raspberry Pi. 
 
 ## 1. rpitouch.h 
 rpitouch.h is a library for handling touch event of Raspberry Pi mounted with a touchable LCD on Raspbian OS.
