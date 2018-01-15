@@ -1,4 +1,4 @@
-# Raspberry Pi Toolkits by wzs
+# My Raspberry Pi Toolkits
 This repository collects some useful toolkits of mine when played with Raspberry Pi. 
 
 ## 1. rpitouch.h 
