@@ -1,0 +1,20 @@
+{
+    "name": "STEPPER-MOTOR",
+    "short_name": "STEPPER",
+    "icons": [
+      {
+        "src": "./img/myicon-128x128.png",
+        "sizes": "128x128",
+        "type": "image/png"
+      },
+      {
+        "src": "./img/myicon-512x512.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "start_url": "/",
+    "display": "fullscreen",
+    "background_color": "#fedfe1",
+    "theme_color": "#fedfe1"
+  }

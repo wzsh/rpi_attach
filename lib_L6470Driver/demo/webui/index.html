@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<!-- 
+    Demo (Stepper Motor Controller) 
+      by Wang Zong-Sheng
+-->
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name=viewport content="width=device-width,initial-scale=1">
+  <link rel=manifest href=/static/manifest.json>
+  <link rel="apple-touch-icon" href="/static/img/myicon-512x512.png">
+  <title>Stepper Motor Demo (PWA) </title>
+  
+  <!-- import Vue before Element -->
+  <!-- <script src="https://unpkg.com/vue/dist/vue.js"></script>-->
+  <script src="/static/lib/vue.js"></script>
+  <!-- import JavaScript -->
+  <script src="/static/lib/eleui/index.js"></script>
+  <script src="/static/lib/axios.js"></script>
+
+  <!-- import CSS -->
+  <link rel="stylesheet" href="/static/lib/eleui/index.css">
+</head>
+<body>
+  <div id="app">
+    <el-container>
+        <el-row>
+            <el-row class="title">
+                Final Term Project (Stepper Motor)  - Wang Zong-Sheng & Jeon Junbeom
+            </el-row>
+            <el-row class="item-row">
+                <el-row>
+                    <el-col :span=4 class="col-title"> Low Speed (cm/s) </el-col>
+                    <el-col :span=14 class="col-title">
+                        <el-slider class="slider" :max=16 :step="0.01" :min=0.1 v-model="low_speed">
+                        </el-slider>
+                    </el-col>
+                    <el-col :span=6> 
+                        <el-input v-model="low_speed" :max=16 :min=0.1></el-input>
+                    </el-col>
+                </el-row> 
+            </el-row>
+            <el-row class="item-row">
+                <el-row>
+                    <el-col :span=4 class="col-title"> High Speed (cm/s) </el-col>
+                    <el-col :span=14 class="col-title">
+                        <el-slider class="slider" :max=16 :step="0.01" :min=0.1 v-model="high_speed">
+                        </el-slider>
+                    </el-col>
+                    <el-col :span=6> 
+                        <el-input v-model="high_speed" :max=16 :min=0.1></el-input>
+                    </el-col>
+                </el-row> 
+            </el-row>
+            <el-row class="item-row">
+                <el-row>
+                    <el-col :span=4 class="col-title"> Accel. (cm/s<sup>2</sup>) </el-col>
+                    <el-col :span=14 class="col-title">
+                        <el-slider class="slider" :max=16 :step="0.01" :min=0.1 v-model="accel">
+                        </el-slider>
+                    </el-col>
+                    <el-col :span=6> 
+                        <el-input v-model="accel" :max=16 :min=0.1></el-input>
+                    </el-col>
+                </el-row> 
+            </el-row>
+            <el-row class="item-row">
+                <el-row>
+                    <el-col :span=4 class="col-title"> Target (cm) </el-col>
+                    <el-col :span=14 class="col-title">
+                        <el-slider class="slider" :max=6.6 :step="0.01" :min=0 v-model="target_pos">
+                        </el-slider>
+                    </el-col>
+                    <el-col :span=6> 
+                        <el-input v-model="target_pos" :max=6.6 :min=0></el-input>
+                    </el-col>
+                </el-row> 
+            </el-row>
+            <el-row class="item-row">
+                <el-row>
+                    <el-col :span=4 class="col-title"> Current Position (cm) </el-col>
+                    <el-col :span=14 class="col-title">
+                        <el-slider class="slider" :max=6.6 :step="0.01" :min=0 v-model="cur_pos" disabled>
+                        </el-slider>
+                    </el-col>
+                    <el-col :span=6> 
+                        <el-input v-model="cur_pos" :max=6.6 :min=0 disabled></el-input>
+                    </el-col>
+                </el-row> 
+            </el-row>
+                    
+            <el-row class="item-row">
+                <el-row> 
+                    <el-col :span=5> 
+                        <el-button type="primary" v-on:click="jog_plus" >Jog+</el-button> 
+                    </el-col>
+                    <el-col :offset=1 :span=5> 
+                        <el-button type="primary" v-on:click="jog_minus" >Jog-</el-button> 
+                    </el-col>    
+                    <el-col :offset=1 :span=5> 
+                        <el-button type="success" v-on:click="move_to_target" >Move</el-button> 
+                    </el-col>   
+                    <el-col :offset=1 :span=5> 
+                        <el-button type="warning" v-on:click="back_home" >Home</el-button> 
+                    </el-col>   
+                </el-row>
+            </el-row>
+           
+            <el-row class="item-row">
+                <el-row>
+                    <el-col :span=7 class="col-title"> 
+                        <el-tag v-bind:type="is_sw_on ? 'danger' : 'success'">Switch On</el-tag>
+                    </el-col>
+                    <el-col :span=7 :offset=1 class="col-title">
+                        <el-tag v-bind:type="is_thwrn ? 'danger' : 'success'">Thermal Warning</el-tag> 
+                    </el-col>
+                    <el-col :span=7 :offset=1 class="col-title">
+                        <el-tag v-bind:type="is_ocd ? 'danger' : 'success'"> Over Current </el-tag>
+                    </el-col>
+                </el-row> 
+                <el-row>
+                    <el-col :span=7 class="col-title"> 
+                        <el-tag v-bind:type="is_busy ? 'danger' : 'success'">Busy</el-tag>
+                    </el-col>
+                    <el-col :span=7 :offset=1 class="col-title">
+                        <el-tag v-bind:type="is_thsd ? 'danger' : 'success'">Thermal Shutdown</el-tag> 
+                    </el-col>
+                    
+                    <el-col :span=7 :offset=1 class="col-title">
+                        <el-tag v-bind:type="is_wrongcmd ? 'danger' : 'success'"> Invaild Command </el-tag>
+                    </el-col>
+                </el-row> 
+                <el-row>
+                    <el-col :span=10 class="col-title">
+                        <el-tag v-bind:type="is_uvlo ? 'danger' : 'success'"> Under Voltage Lock Out </el-tag>
+                    </el-col>
+                    <el-col :span=10 :offset=1 class="col-title">
+                        <el-tag v-bind:type="is_notperfcmd ? 'danger' : 'success'"> No performed Command </el-tag>
+                    </el-col>
+                </el-row> 
+            </el-row>
+            
+        </el-row>
+    </el-container>
+  </div>
+</body>
+  
+<script>
+Vue.prototype.$http = axios
+
+new Vue({
+    el: '#app',
+    data: function() {
+        return {   
+            timer: null,
+            //API_URL: 'http://127.0.0.1:8866',
+            API_URL: '',
+            //HOME_POS = 0,
+            pid_stopped: true,
+            low_speed: 0.8,
+            high_speed: 4.83,
+            accel: 1.8,
+            target_pos: 0,
+            cur_pos: 0,
+            //SW_ON|BUSY|UVLO|OCD|THWRN|THSD|NOTPERFCMD|WRONGCMD
+            is_sw_on: false,
+            is_busy: false,
+            is_uvlo: false,
+            is_ocd: false,
+            is_thwrn: false,
+            is_thsd: false,
+            is_notperfcmd: false,
+            is_wrongcmd: false,
+        }
+    },
+    watch: {
+        high_speed:{
+            handler (value) {
+                if(value < this.low_speed)
+                    this.low_speed = value
+            }
+        },
+        low_speed:{
+            handler (value) {
+                if(value > this.high_speed)
+                    this.high_speed = value
+            }
+        },
+        cur_pos:{
+            handler (value) {
+                if( Math.abs(this.cur_pos-this.target_pos)<=0.05)
+                    this.cur_pos = this.target_pos
+            }
+        },
+    },
+    mounted: function() {
+        this.timer = setInterval(() => {
+            //console.log('insidetimer ' + this.timer)
+            const result = this.$http.get(this.API_URL + '/api/stepper')
+            result.then((res) => {
+                if (res.data.status) {
+                    this.cur_pos =  res.data.data.curPos
+                    this.is_sw_on = res.data.data.swon
+                    this.is_busy = res.data.data.busy
+                    this.is_uvlo = res.data.data.uvlo
+                    this.is_ocd = res.data.data.ocd
+                    this.is_thwrn = res.data.data.thwrn
+                    this.is_thsd = res.data.data.thsd
+                    this.is_notperfcmd = res.data.data.notperfcmd
+                    this.is_wrongcmd = res.data.data.wrongcmd
+                } else {
+                    this.stopTemper(null)
+                    console.log(res.data.message)
+                    this.$message.error(res.data.message)
+                }
+            }, (err) => {
+                console.log(err)
+                this.$message.error('Request Error')
+            })  
+        }, 200)
+    },
+    methods: {
+        post_data(action){
+            // {"maxSpd": 4, "minSpd": 1, "acc": "2", "targetPos": 1.5, "action":"move"}
+            let obj = {
+                maxSpd: this.high_speed,
+                minSpd: this.low_speed,
+                acc: this.accel,
+                targetPos: this.target_pos,
+                action: action
+            }
+            const result = this.$http.post(this.API_URL + '/api/stepper', obj)
+            result.then((res) => {
+                if (!res.data.status) {
+                    console.log(res.data.info)
+                    this.$message.error(res.data.info)
+                }
+            }, (err) => {
+                console.log(err)
+                this.$message.error('Request Error')
+            })
+        },
+        jog_plus(e){
+            this.post_data("jog+")           
+        },
+        jog_minus(e){
+            this.post_data("jog-")
+        },
+        move_to_target (e) {
+            this.post_data("move")
+        },
+        back_home (e) {
+            this.post_data("home")
+        }
+
+    }
+
+})
+</script>
+<style>
+#app {
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
+    margin-top: 20px;
+}
+.el-row{
+    width: 100%;
+}
+.title{
+    font-size:28px;
+    padding-bottom: 15px;
+}
+.item-row{
+    padding-top: 10px; 
+    padding-bottom: 15px;
+}
+.col-title{
+    padding-top: 15px;
+    padding-bottom:10px;
+    text-align: left;
+}
+.col-comp{
+    text-align: right;
+}
+.el-row.content{
+    padding:16px;
+}
+.title{
+    font-size:28px;
+}
+.el-input{
+    width: 80px;
+}
+.el-button{
+    width:100%;
+    margin-top: 12px ;
+}
+</style>
+</html>
